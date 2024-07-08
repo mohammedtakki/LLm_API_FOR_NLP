@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  pgvector_demo:
+    build:
+      context: ./PgVector_Demo
+    ports:
+      - "8888:8888"
+    networks:
+      - my_network
+
+    environment:
+      - API_KEY=your_google_generativeai_api_key
+       - POSTGRES_CONNECTION_STRING=postgresql+psycopg2://postgres:123@postgres:5432/VectorDB2
+
+  rh_rh_help:
+    build:
+      context: ./RH/RH-HELP
+    ports:
+      - "4200:80"  # Mapped Angular's port 80 to host port 8080
+    
+    networks:
+      - my_network
+
+    depends_on:
+      - pgvector_demo
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: VectorDB2
+    ports:
+      - "5432:5432"
+    networks:
+      - my_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  my_network:
+
+volumes:
+  postgres_data:
+
+
